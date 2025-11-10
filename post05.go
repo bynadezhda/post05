@@ -50,6 +50,10 @@ func exists(username string) int {
 	userID := -1
 	statement := fmt.Sprintf(`SELECT "id" FROM "users" WHERE username = '%s'`, username)
 	rows, err := db.Query(statement)
+	if err != nil {
+		fmt.Println("Query error:", err)
+		return -1
+	}
 
 	for rows.Next() {
 		var id int
@@ -76,13 +80,12 @@ func AddUser(d Userdata) int {
 
 	userID := exists(d.Username)
 	if userID != -1 {
-		fmt.Println("User already exists:", Username)
+		fmt.Println("User already exists:", d.Username)
 		return -1
 	}
 
 	insertStatement := `INSERT INTO "users" ("username") values ($1)`
 	_, err = db.Exec(insertStatement, d.Username)
-
 	if err != nil {
 		fmt.Println(err)
 		return -1
@@ -94,7 +97,6 @@ func AddUser(d Userdata) int {
 	}
 
 	insertStatement = `INSERT INTO "usersdata" ("userid", "name", "surname", "description") VALUES ($1, $2, $3, $4)`
-
 	_, err = db.Exec(insertStatement, userID, d.Name, d.Surname, d.Description)
 	if err != nil {
 		fmt.Println("db.Exec()", err)
