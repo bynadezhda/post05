@@ -66,14 +66,17 @@ func exists(username string) int {
 
 func AddUser(d Userdata) int {
 	d.Username = strings.ToLower(d.Username)
+
 	db, err := openConnection()
 	if err != nil {
+		fmt.Println(err)
 		return -1
 	}
 	defer db.Close()
 
 	userID := exists(d.Username)
 	if userID != -1 {
+		fmt.Println("User already exists:", Username)
 		return -1
 	}
 
@@ -81,6 +84,7 @@ func AddUser(d Userdata) int {
 	_, err = db.Exec(insertStatement, d.Username)
 
 	if err != nil {
+		fmt.Println(err)
 		return -1
 	}
 
@@ -93,6 +97,7 @@ func AddUser(d Userdata) int {
 
 	_, err = db.Exec(insertStatement, userID, d.Name, d.Surname, d.Description)
 	if err != nil {
+		fmt.Println("db.Exec()", err)
 		return -1
 	}
 
