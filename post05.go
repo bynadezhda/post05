@@ -42,29 +42,22 @@ func exists(username string) int {
 
 	db, err := openConnection()
 	if err != nil {
+		fmt.Println("exists(): connection error:", err)
 		return -1
 	}
 
 	defer db.Close()
 
-	userID := -1
-	statement := fmt.Sprintf(`SELECT "id" FROM "users" WHERE username = '%s'`, username)
-	rows, err := db.Query(statement)
+	var userID int
+	statement := `SELECT id FROM users WHERE username = $1`
+	err = db.QueryRow(statement, username).Scan(&userID)
 	if err != nil {
-		fmt.Println("Query error:", err)
-		return -1
-	}
-
-	for rows.Next() {
-		var id int
-		err = rows.Scan(&id)
-		if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
 			return -1
 		}
-		userID = id
+		fmt.Println("exists(): query error:", err)
+		return -1
 	}
-
-	defer rows.Close()
 	return userID
 }
 
