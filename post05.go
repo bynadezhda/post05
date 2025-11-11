@@ -90,7 +90,7 @@ func AddUser(d Userdata) int {
 		return userID
 	}
 
-	insertStatement = `INSERT INTO "usersdata" ("userid", "name", "surname", "description") VALUES ($1, $2, $3, $4)`
+	insertStatement = `INSERT INTO "userdata" ("userid", "name", "surname", "description") VALUES ($1, $2, $3, $4)`
 	_, err = db.Exec(insertStatement, userID, d.Name, d.Surname, d.Description)
 	if err != nil {
 		fmt.Println("db.Exec()", err)
@@ -107,7 +107,7 @@ func DeleteUser(id int) error {
 	}
 	defer db.Close()
 
-	statement := fmt.Sprintf(`SELECT "username" FROM "users" WHERE id=%s`, id)
+	statement := fmt.Sprintf(`SELECT "username" FROM "users" WHERE id=%d`, id)
 
 	rows, err := db.Query(statement)
 	if err != nil {
@@ -127,13 +127,13 @@ func DeleteUser(id int) error {
 		return fmt.Errorf("User with ID %d does not exist", id)
 	}
 
-	deleteStatement := `DELETE FROM "userdata" WHERE id=$1`
+	deleteStatement := `DELETE FROM "userdata" WHERE "userid"=$1`
 	_, err = db.Exec(deleteStatement, id)
 	if err != nil {
 		return err
 	}
 
-	deleteStatement = `DELETE FROM "user" WHERE id=$1`
+	deleteStatement = `DELETE FROM "users" WHERE id=$1`
 	_, err = db.Exec(deleteStatement, id)
 	if err != nil {
 		return err
